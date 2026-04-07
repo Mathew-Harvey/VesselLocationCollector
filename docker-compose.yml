@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ais_collector
+      POSTGRES_USER: ais
+      POSTGRES_PASSWORD: ais_local_2026
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Not exposed to host network - only the collector talks to it
+    # Uncomment the next 2 lines if you want to query from host with psql/pgAdmin
+    # ports:
+    #   - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ais -d ais_collector"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  collector:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      AISSTREAM_API_KEY: ${AISSTREAM_API_KEY}
+      DATABASE_URL: postgresql://ais:ais_local_2026@db:5432/ais_collector
+      MIN_VESSEL_LENGTH_M: 30
+      POSITION_INTERVAL_MINUTES: 60
+      RETENTION_DAYS: 365
+      BATCH_FLUSH_INTERVAL_MS: 5000
+      STATS_INTERVAL_MS: 60000
+
+volumes:
+  pgdata:

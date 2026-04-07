@@ -1,0 +1,29 @@
+# render.yaml - deploy as a Background Worker on Render
+# This is NOT a web service - it's a long-running process
+
+services:
+  - type: worker
+    name: ais-collector
+    runtime: node
+    plan: starter  # $7/month - enough for this workload
+    buildCommand: npm install
+    startCommand: node collector.js
+    envVars:
+      - key: AISSTREAM_API_KEY
+        sync: false  # set manually in dashboard
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ais-db
+          property: connectionString
+      - key: MIN_VESSEL_LENGTH_M
+        value: 30
+      - key: POSITION_INTERVAL_MINUTES
+        value: 60
+      - key: RETENTION_DAYS
+        value: 365
+
+databases:
+  - name: ais-db
+    plan: starter  # $7/month, 1GB storage
+    databaseName: ais_collector
+    postgresMajorVersion: 16

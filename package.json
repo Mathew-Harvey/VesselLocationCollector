@@ -1,0 +1,21 @@
+{
+  "name": "ais-collector",
+  "version": "1.0.0",
+  "description": "AIS vessel position collector for biofouling risk prediction",
+  "main": "collector.js",
+  "scripts": {
+    "start": "node collector.js",
+    "stats": "node query.js stats",
+    "idle": "node query.js idle",
+    "vessel": "node query.js vessel",
+    "growth": "node query.js growth"
+  },
+  "keywords": ["ais", "biofouling", "maritime"],
+  "author": "Mat Harvey",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.4.1",
+    "pg": "^8.20.0",
+    "ws": "^8.20.0"
+  }
+}
